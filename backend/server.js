@@ -10,6 +10,9 @@ const db = new pg.Pool({
     database: process.env.PG_DATABASE,
     user: process.env.PG_USER,
     password: process.env.PG_PASSWORD,
+    ssl: {
+        rejectUnauthorized: false,  // This allows self-signed certificates if needed.
+    },
 });
 const dbResult = await db.query('select now()');
 console.log('Database connection established on', dbResult.rows[0].now);
