@@ -1,0 +1,35 @@
+body {
+    background-color: #333333;
+    color: #cccccc;
+    font-family: monospace;
+}
+
+h1 {
+    color: #6495ed;
+}
+
+input, button {
+    font-family: inherit;
+}
+
+#visuals {
+    margin-top: 10px;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th {
+    color: #6495ed;
+    text-align: left;
+    border-bottom: 1px solid #6495ed;
+}
+
+th, td {
+    padding: 8px;
+}
+
+tr:nth-child(even) {
+    background-color: #444444;
+}

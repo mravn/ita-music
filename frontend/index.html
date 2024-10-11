@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Music</title>
+        <link rel="stylesheet" href="styles.css">
+        <script src="d3.v7.js"></script>
+    </head>
+    <body>
+        <h1>Hello, music lovers!</h1>
+        <p>
+            Find albums released between <input type="number" id="startYear" min="1950" max="2024" value="2000">
+            and <input type="number" id="endYear" min="1951" max="2025" value="2010">
+            <button onclick="fetchAlbums()">Go!</button>
+        </p>
+        <div id="visuals"></div>
+    </body>
+    <script>
+        function fetchAlbums() {
+            const startYear = d3.select('#startYear').property('value');
+            const endYear = d3.select('#endYear').property('value');
+            d3.json(`/api/albums?start=${startYear}&end=${endYear}`).then((albums) => {
+                if (albums.length === 0) {
+                    d3.select('#visuals').html('No albums found.')
+                }
+                const headers = Object.keys(albums[0]);
+                const table = d3.select('#visuals')
+                    .html('')
+                    .append('table');
+                table.append('thead')
+                    .append('tr')
+                    .selectAll('th')
+                    .data(headers)
+                    .enter()
+                    .append('th')
+                    .text((d) => d);
+                table.append('tbody')
+                    .selectAll('tr')
+                    .data(albums)
+                    .enter()
+                    .append('tr')
+                    .selectAll('td')
+                    .data((d) => Object.values(d))
+                    .enter()
+                    .append('td')
+                    .text((d) => d);
+            });
+        }
+    </script>
+</html>
