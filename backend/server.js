@@ -11,7 +11,7 @@ const db = new pg.Pool({
     user: process.env.PG_USER,
     password: process.env.PG_PASSWORD,
     ssl: {
-        rejectUnauthorized: false,  // This allows self-signed certificates if needed.
+        rejectUnauthorized: false,
     },
 });
 const dbResult = await db.query('select now()');
