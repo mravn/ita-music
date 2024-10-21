@@ -12,54 +12,53 @@ const db = new pg.Pool({
     database: process.env.PG_DATABASE,
     user: process.env.PG_USER,
     password: process.env.PG_PASSWORD,
-    ssl: {
+    ssl: process.env.PG_REQUIRE_SSL ? {
         rejectUnauthorized: false,
-    },
+    } : undefined,
 });
 const dbResult = await db.query('select now()');
 console.log('Database connection established on', dbResult.rows[0].now);
 
-console.log('Resetting tables...');
+console.log('Recreating tables...');
 db.query(`
 drop table if exists albums;
 drop table if exists artists;
 
+create table artists (
+	artist_id   integer unique not null,
+	nationality char(2),
+	stage_name  text not null
+);
+
 create table albums (
-	album_id         integer,
-	artist_id        integer,
-	release_date     date,
-	title            text,
+	album_id         integer unique not null,
+	artist_id        integer references artists (artist_id),
+	release_date     date not null,
+	title            text not null,
     riaa_certificate text
 );
-
-create table artists (
-	artist_id   integer,
-	nationality char(2),
-	stage_name  text
-);
 `);
+console.log('Tables recreated.');
 
-{
-	console.log('Copying artists...');
+console.log('Copying data from CSV files...');
+copyIntoTable(db, `
+	copy artists (artist_id, stage_name, nationality)
+	from stdin
+	with csv`, 'db/artists.csv');
+copyIntoTable(db, `
+	copy albums (album_id, title, artist_id, release_date, riaa_certificate)
+	from stdin
+	with csv header`, 'db/albums.csv');
+await db.end();
+console.log('Data copied.');
+
+async function copyIntoTable(db, sql, file) {
 	const client = await db.connect();
 	try {
-        const ingestStream = client.query(copyFrom('copy artists (artist_id, stage_name, nationality) from stdin with csv'));
-        const sourceStream = fs.createReadStream('db/artists.csv')
-        await pipeline(sourceStream, ingestStream);
-	} finally {
-		client.release();
-	}
-}
-{
-	console.log('Copying albums...');
-	const client = await db.connect();
-	try {
-		const ingestStream = client.query(copyFrom('copy albums (album_id, title, artist_id, release_date, riaa_certificate) from stdin with csv header'))
-		const sourceStream = fs.createReadStream('db/albums.csv');
+		const ingestStream = client.query(copyFrom(sql))
+		const sourceStream = fs.createReadStream(file);
 		await pipeline(sourceStream, ingestStream);
 	} finally {
 		client.release();
 	}
 }
-await db.end();
-console.log('Data copied');
