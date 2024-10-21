@@ -2,6 +2,14 @@
 
 A demo web application project.
 
+## Project overview
+
+```
+db/            CSV files and code to (re-)create database tables from those files
+backend/       express webserver code
+frontend/      HTML, CSS, and JavaScript resources used by the browser
+```
+
 ## Setup
 
 Add a local `.env` file to the project containing PostgreSQL configuration
