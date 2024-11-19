@@ -20,7 +20,7 @@ const dbResult = await db.query('select now()');
 console.log('Database connection established on', dbResult.rows[0].now);
 
 console.log('Recreating tables...');
-db.query(`
+await db.query(`
 drop table if exists albums;
 drop table if exists artists;
 
@@ -41,11 +41,11 @@ create table albums (
 console.log('Tables recreated.');
 
 console.log('Copying data from CSV files...');
-copyIntoTable(db, `
+await copyIntoTable(db, `
 	copy artists (artist_id, stage_name, nationality)
 	from stdin
 	with csv`, 'db/artists.csv');
-copyIntoTable(db, `
+await copyIntoTable(db, `
 	copy albums (album_id, title, artist_id, release_date, riaa_certificate)
 	from stdin
 	with csv header`, 'db/albums.csv');
