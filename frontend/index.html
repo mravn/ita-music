@@ -38,6 +38,11 @@
                     .data(albums)
                     .enter()
                     .append('tr')
+                    .on('click', function (event, d) {
+                        const tr = d3.select(this);
+                        tr.classed('selected', !tr.classed('selected'));
+                        console.log('User toggled selection on data', d);
+                    })
                     .selectAll('td')
                     .data((d) => Object.values(d))
                     .enter()

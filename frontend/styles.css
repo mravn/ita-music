@@ -24,12 +24,30 @@ th {
     color: #6495ed;
     text-align: left;
     border-bottom: 1px solid #6495ed;
+    pointer-events: none;
 }
 
 th, td {
     padding: 8px;
+    user-select: none;
+}
+
+tr {
+    cursor: pointer;
+}
+
+tr:hover {
+    color: #eeeeee;
 }
 
 tr:nth-child(even) {
     background-color: #444444;
+}
+
+tr.selected {
+    background-color: #337733;
+}
+
+tr.selected:nth-child(even) {
+    background-color: #448844;
 }
